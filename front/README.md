@@ -1,249 +1,88 @@
 # Análisis del Frontend
-
-```text
-┌───────────────────────┐
-│      Backend API      │
-└───────────┬───────────┘
-            │
-            V
-┌───────────────────────┐
-│    metricsService     │
-└───────────┬───────────┘
-            │
-            V
-┌───────────────────────┐
-│      Dashboard        │
-│                       │
-│  useEffect()          │
-│  useState()           │
-└───────┬─────────┬─────┘
-        │         │
-        V         V
- MetricCard    Chart.js
-                  │
-                  V
-          Gráfica Lineal
-```
+┌───────────────────┐
+│    Backend API    │
+└─────────┬─────────┘
+          │ JSON
+          ▼
+┌───────────────────┐
+│ metricsService.js │
+│  (axios)          │
+└─────────┬─────────┘
+          │
+          ▼
+┌───────────────────┐
+│  Dashboard.jsx    │
+│  useState/        │
+│  useEffect        │
+└────┬──────────┬───┘
+     │          │
+     ▼          ▼
+┌─────────┐ ┌──────────────┐
+│Metric   │ │ MetricsChart │
+│Card.jsx │ │    .jsx      │
+└─────────┘ └──────────────┘
 
 ## Estructura de Carpetas
 
 El resumen de la estructura del proyecto es la siguiente (solo elementos lógicos relevantes para la implementación):
 
-```text
+```
 front/productivity-dashboard/src
+├── App.jsx               → Root
 ├── App.css
-├── App.jsx
-├── component
-│   └── Dashboard.jsx
+├── main.jsx             
 ├── index.css
-├── main.jsx
-└── services
-    └── metricsService.js
+├── component/
+│   ├── Dashboard.jsx     → Coordina el estado y los componentes.
+│   ├── Dashboard.css
+│   ├── MetricCard.jsx    → Formato de las tarjetas (reutilizable) para mostrar indicadores individuales.
+│   ├── MetricCard.css
+│   ├── MetricsChart.jsx  → Formato de gráficas (reutilizable).
+│   └── MetricsChart.css
+└── services/
+    └── metricsService.js → Comunicación con el backend vía axios.
+
 ```
 
-### Descripción
+### Flujo de datos
+Backend API
+      |
+      ▼
+metricService.js -> Realiza la petición HTTP con axios.
+      |
+      ▼
+Dashboard.jsx   -> Maneja estado y coordina los componentes.
+    │
+    ├──▶ MetricCard.jsx    -> Muestra total, promedio y máximo de determinada metrica.
+    └──▶ MetricsChart.jsx  -> Renderiza la gráfica de determinada métrica.
 
-| Carpeta/Archivo | Descripción.                                |
-| --------------- | ------------------------------------------- |
-| components      | Componentes visuales de React               |
-| Dashboard.jsx   | Dashboard principal con métricas y gráficas |
-| services        | Comunicación con APIs                       |
-| App.jsx         | Componente raíz                             |
 
-### PROS
 
-- Carpeta especifica para la lógica relacionada a obtención de información por medio de APIs.
-- Existencia de carpeta de componentes externa a App.jsx.
+### Errores originales del código
+- Los componentes de MetricCard y MetricChart originalmente estaban definidos dentro de Dashboard.jsx, teniendo múltiples componentes en un mismo archivo, lo que dificultaba la reutilización de código y la legibilidad.
 
-### CONS
+- Toda la lógica de dashboard, por ende, tenía una mezcla de cálculos con la construcción de las tarjetas, gráficas y su renderizado.
 
-- Demasiadas responsabilidades lógicas dentro de Dashboard.jsx.
-- Creación de múltiples componentes en un solo archivo.
-- Estructura de proyecto que no es ilurstrativa al flujo de trabajo del proyecto.
+- El CSS estaba también incluido en Dashboard.jsx junto a la lógica de componentes; al no estar separado por componentes, dificultaba la reutilización y legibilidad.
 
-### Propuesta
+- Si bien no es un error, originalmente la gráfica solo mostraba los commits, entonces definimos como área de mejora el que la gráfica se pudiese actualizar a mostrar bugs encontrados en su lugar.
 
-```text
-front/productivity-dashboard/src
-├── components/
-│   ├── Dashboard.jsx
-│   ├── MetricCard.jsx
-│   └── DashboardChart.jsx
-│
-├── services/
-│   └── metricsService.js
-│
-├── App.jsx
-├── App.css
-├── main.jsx
-└── index.css
-```
+- Además, el frontend real se encuentra en productivity-dashboard, no directamente en la carpeta "front"
 
-- Dashboard ahora solo tiene la función de coordinar otros componentes.
-- Potenciales reusos de entidades visuales ahora son más obvios al desarrollador.
-- Modularidad.
 
-## Componentes Principales
+### Responsabilidad de los componentes
 
-### Dashboard
+metricService.js: Centraliza las llamadas HTTP al backend. Cualquier componente que necesite datos los importa desde aquí. 
 
-Componente principal encargado de:
+Dashboard.jsx: Es el coordinador que se encarga de mantener el estado de los datos obtenidos desde la API, calcular los indicadores (total, max, promedio) y pasar esa información a los componentes hijos. Aquí se contienen los botones de las métricas (commit o bugs); el que el usuario seleccione se vuelve la métrica activa y actual, lo que dispara automáticamente una petición al backend que actualice los componentes.
 
-- Obtener información desde la API.
-- Administrar el estado de los datos.
-- Calcular métricas agregadas.
-- Construir la gráfica de evolución.
-- Renderizar tarjetas de indicadores.
+MetricCard.jsx: Componente reutilizable que muestre un indicador individual con un título y un valor. Se usa 3 veces para mostrar el total, promedio y máximo de la métrica seleccionada por el usuario.
 
-```jsx
-function Dashboard()
-```
+MetricsChart.jsx: Componente reutilizable que se encarga de renderizar la gráfica. Recibe los datos y con ello puede representar cualquier métrica sin necesidad de crear más archivos o componentes para cada gráfica.
 
-### MetricCard
+### Mejoras
+- Se separó el antiguo dashboard con múltiples componentes en dos archivos de los componentes de MetricCard y MetricsChart, volviéndolos independientes, reutilizables y con su propio CSS.
 
-Componente reutilizable utilizado para mostrar indicadores individuales.
+- Dashboard ahora solo coordina y calcula.
 
-```jsx
-function MetricCard({ title, value })
-```
-
-Responsabilidades:
-
-- Mostrar el nombre de la métrica.
-- Mostrar el valor calculado.
-
-**Sería ampliamente recomendado definirlo en un archivo aparte**
-
-## Manejo del Estado con Hooks
-
-### useState
-
-Se utiliza para almacenar los datos obtenidos desde la API.
-
-```jsx
-const [data, setData] = useState([]);
-```
-
-### useEffect
-
-En este caso, cuando el componente se monte, el useEffect será el encargado de llamar a la función que obtendrá los datos haciendo usos de llamadas a APIs.
-
-```jsx
-useEffect(() => {
-  loadData();
-}, []);
-```
-
-## Consumo de APIs
-
-El proyecto propone una capa de servicios en la que manejar exclusivamente la lógica de acceso a datos.
-
-En este caso, importamos las funciones definidas en esta carpeta en cualquier componente desde el que necesitemos manejar/mover información.
-
-```jsx
-import { getMetricData } from "../services/metricsService";
-```
-
-### Ventajas
-
-- Separación de responsabilidades.
-- Reutilización de código.
-- Mayor mantenibilidad.
-- Facilidad para pruebas unitarias.
-
-**Esta es una de las mejores parted de este código**
-
-## Relación entre Componentes
-
-Es muy lineal.
-
-```jsx
-<MetricCard title="Total Commits" value={total} />
-```
-
-El componente Dashboard calcula los valores y los transmite mediante props al Metric Card.
-
-## Implementación de Gráficas y Visualizaciones
-
-La visualización se realiza utilizando _Chart.js_
-
-```jsx
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-);
-```
-
-### Construcción de datos
-
-```jsx
-const chartData = {
-  labels: data.map((item) => item.label),
-  datasets: [
-    {
-      label: "Commits",
-      data: data.map((item) => item.value),
-    },
-  ],
-};
-```
-
-### Renderizado
-
-```jsx
-<Line data={chartData} options={chartOptions} />
-```
-
-## Resumen de Posibles Mejoras
-
-### Separar MetricCard
-
-Se recomienda:
-
-```text
-components/
-├── Dashboard.jsx
-└── MetricCard.jsx
-```
-
-### Errores más desciptivos.
-
-```jsx
-console.error(error);
-```
-
-Se sucede un error, un usuario de la aplicación no tendrá retoalimentación clara, entorpeciendo la experiencia.
-Se puede crear un componente que se encargue de mostrar de manera comprensiva los errores al usuario final .
-
-### Planeación de manejo de estilos
-
-Actualmente se utilizan estilos inline.
-
-```jsx
-style={{ ... }}
-```
-
-Se recomienda:
-
-- CSS Modules
-- Tailwind CSS
-- Material UI
-- Bootstrap
-
-### Uso de TypeScript
-
-Definir tipos para las métricas.
-
-```tsx
-interface Metric {
-  label: string;
-  value: number;
-}
-```
-
-El flujo de datos no es muy complejo actualmente, pero typesript nos ayudará a tener un código más sostenible y facil de interpretar (e cuanto a la capa de datos se refiere).
+- Se creo un selector de métricas con botones que actualiza la gráfica y las tarjetas para mostrar la información de los commits o bugs hechos por los desarrolladores.

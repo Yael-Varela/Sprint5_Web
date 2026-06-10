@@ -1,4 +1,4 @@
-# Análisis y Evaluación Técnica de Proyectos Full Stack
+# Ejercicio sprint 5: Actividad Full Stack
 
 ## README front
 
