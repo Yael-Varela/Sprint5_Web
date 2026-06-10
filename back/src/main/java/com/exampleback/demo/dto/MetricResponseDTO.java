@@ -2,7 +2,7 @@ package com.exampleback.demo.dto;
 
 public class MetricResponseDTO {
 
-    private String label; //It's a weird name for the date
+    private String label;
     private Integer value;
 
     public MetricResponseDTO() {}
