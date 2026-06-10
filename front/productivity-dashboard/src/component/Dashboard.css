@@ -16,17 +16,24 @@
     margin-bottom: 25px;
 }
 
-.dashboard-charts {
-    display: grid;
-    gap: 25px;
+.buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
 }
 
-.loading, .error {
-    text-align: center;
-    padding: 60px;
-    font-size: 1.2rem;
+.metric-btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid royalblue;
+    background: white;
+    color: royalblue;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.error {
-    color: red;
+.metric-btn:hover {
+    background: royalblue;
+    color: white;
 }

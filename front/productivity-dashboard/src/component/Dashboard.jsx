@@ -1,42 +1,26 @@
 import { useEffect, useState } from "react";
-import { Line } from "react-chartjs-2";
+import MetricCard from "./MetricCard";
+import MetricsChart from "./MetricsChart";
+import { getMetricData } from "../services/metricsService";
+import "./Dashboard.css";
 
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler
-    } from "chart.js";
+const METRICS = [
+    {key: "commits", label: "Commits"},
+    {key: "bugs", label: "Bugs solved"},
+];
 
-    import { getMetricData } from "../services/metricsService";
+function Dashboard() {
 
-    ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler
-    );
-
-    function Dashboard() {
-
+    const [currentMetric, setCurrentMetric] = useState(METRICS[0]);
     const [data, setData] = useState([]);
 
     useEffect(() => {
-        loadData();
-    }, []);
+        loadData(currentMetric.key);
+    }, [currentMetric]);
 
-    const loadData = async () => {
+    const loadData = async (metric) => {
         try {
-        const result = await getMetricData("commits");
+        const result = await getMetricData(metric);
         setData(result);
         } catch (error) {
         console.error(error);
@@ -57,120 +41,33 @@ import {
         data.length > 0
         ? Math.max(...data.map(x => x.value))
         : 0;
+    
+       return (
+        <div className="dashboard">
+            <h1>Dashboard de Métricas</h1>
+            <div className="dashboard-cards">
+                <MetricCard title={`Total ${currentMetric.label}`} value={total} />
+                <MetricCard title="Promedio Diario" value={promedio}/>
+                <MetricCard title="Máximo" value={maximo}/>
+            </div>
 
-    const chartData = {
-        labels: data.map(item => item.label),
-        datasets: [
-        {
-            label: "Commits",
-            data: data.map(item => item.value),
-            borderColor: "#2563eb",
-            backgroundColor: "rgba(37,99,235,0.2)",
-            fill: true,
-            tension: 0.4
-        }
-        ]
-    };
-
-    const chartOptions = {
-        responsive: true,
-        plugins: {
-        legend: {
-            position: "top"
-        }
-        }
-    };
-
-    return (
-        <div
-        style={{
-            minHeight: "100vh",
-            background: "#f5f7fa",
-            padding: "30px"
-        }}
-        >
-        <h1
-            style={{
-                color: "royalblue"
-            }}
-        >Dashboard de Métricas</h1>
-
-        <div
-            style={{
-            display: "grid",
-            gridTemplateColumns:
-                "repeat(auto-fit,minmax(250px,1fr))",
-            gap: "20px",
-            marginBottom: "25px"
-            }}
-        >
-            <MetricCard
-            title="Total Commits"
-            value={total}
+            <div className="buttons">
+                {METRICS.map(i => (
+                    <button
+                        key = {i.key}
+                        className= {"metric-btn"}
+                        onClick={() => setCurrentMetric(i)}
+                    >
+                        {i.label}
+                    </button>
+                ))}
+            </div>
+            <MetricsChart
+                data={data}
+                label={currentMetric.label}
             />
-
-            <MetricCard
-            title="Promedio Diario"
-            value={promedio}
-            />
-
-            <MetricCard
-            title="Máximo"
-            value={maximo}
-            />
-        </div>
-
-        <div
-            style={{
-            background: "white",
-            padding: "25px",
-            borderRadius: "16px",
-            boxShadow:
-                "0 4px 12px rgba(0,0,0,0.08)"
-            }}
-        >
-            <h2
-                style={{
-                    color: "black"
-                }}
-            >Evolución de Commits</h2>
-
-            <Line
-            data={chartData}
-            options={chartOptions}
-            />
-        </div>
         </div>
     );
-    }
-
-    function MetricCard({ title, value }) {
-    return (
-        <div
-        style={{
-            background: "white",
-            padding: "20px",
-            borderRadius: "16px",
-            boxShadow:
-            "0 4px 12px rgba(0,0,0,0.08)"
-        }}
-        >
-        <h4
-            style={{
-            color: "#6b7280",
-            marginBottom: "10px"
-            }}
-        >
-            {title}
-        </h4>
-
-        <h2
-            style={{
-                color: "black"
-            }}
-        >{value}</h2>
-        </div>
-    );
-}
+};
 
 export default Dashboard;
