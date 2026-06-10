@@ -1,0 +1,32 @@
+.dashboard {
+    min-height: 100vh;
+    background: #f5f7fa;
+    padding: 30px;
+}
+
+.dashboard h1 {
+    color: royalblue;
+    margin-bottom: 25px;
+}
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.dashboard-charts {
+    display: grid;
+    gap: 25px;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 60px;
+    font-size: 1.2rem;
+}
+
+.error {
+    color: red;
+}
