@@ -1,5 +1,6 @@
 # Análisis del Frontend
 ```text
+
 ┌───────────────────┐
 │    Backend API    │
 └─────────┬─────────┘
