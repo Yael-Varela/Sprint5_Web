@@ -1,5 +1,5 @@
 # Análisis del Backend
-```
+```text
 ┌───────────────────┐
 │      Frontend     │
 └─────────┬─────────┘
@@ -36,14 +36,13 @@
 │     Frontend      │
 └───────────────────┘ 
 Actualiza
-
 ```
 
 ## Estructura de Carpetas
 
 El resumen de la estructura lógica del backend es:
 
-```txt
+```text
 back/
 ├── pom.xml -> Dependencias
 └── src/
