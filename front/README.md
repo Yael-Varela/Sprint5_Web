@@ -1,4 +1,5 @@
 # Análisis del Frontend
+```text
 ┌───────────────────┐
 │    Backend API    │
 └─────────┬─────────┘
@@ -21,12 +22,13 @@
 │Metric   │ │ MetricsChart │
 │Card.jsx │ │    .jsx      │
 └─────────┘ └──────────────┘
+```
 
 ## Estructura de Carpetas
 
 El resumen de la estructura del proyecto es la siguiente (solo elementos lógicos relevantes para la implementación):
 
-```
+```text
 front/productivity-dashboard/src
 ├── App.jsx               → Root
 ├── App.css
