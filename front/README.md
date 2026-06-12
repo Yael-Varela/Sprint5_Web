@@ -47,6 +47,7 @@ front/productivity-dashboard/src
 ```
 
 ### Flujo de datos
+```text
 Backend API
       |
       ▼
@@ -58,6 +59,7 @@ Dashboard.jsx   -> Maneja estado y coordina los componentes.
     ├──▶ MetricCard.jsx    -> Muestra total, promedio y máximo de determinada metrica.
     └──▶ MetricsChart.jsx  -> Renderiza la gráfica de determinada métrica.
 
+```
 
 
 ### Errores originales del código
